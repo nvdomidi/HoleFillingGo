@@ -91,6 +91,7 @@ type VertexMap struct {
 	intToVrt map[int]Vertex
 }
 
+// Use this to read binary STL into Mesh structure
 func readBinarySTL(filepath string) Mesh {
 	data, err := os.ReadFile(filepath)
 	if err != nil {
@@ -128,32 +129,6 @@ func readBinarySTL(filepath string) Mesh {
 	}
 
 	return m
-}
-
-func WriteToOBJ(v []Vertex, filepath string) error {
-	file, err := os.Create(filepath)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	// Write the vertices
-	for _, vert := range v {
-		_, err := fmt.Fprintf(file, "v %f %f %f\n", vert.X, vert.Y, vert.Z)
-		if err != nil {
-			return err
-		}
-	}
-
-	// Write the faces
-	for i, _ := range v {
-		_, err = fmt.Fprintf(file, "f %d %d\n", i+1, (i+1)%len(v)+1)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 func (m *Mesh) WriteToOBJ(filepath string) error {
@@ -249,19 +224,6 @@ func reverseInts(ints []int) {
 		opp := len(ints) - 1 - i
 		ints[i], ints[opp] = ints[opp], ints[i]
 	}
-}
-
-// equalRows checks if two rows are equal
-func equalRows(row1, row2 [2]int) bool {
-	if len(row1) != len(row2) {
-		return false
-	}
-	for i := range row1 {
-		if row1[i] != row2[i] {
-			return false
-		}
-	}
-	return true
 }
 
 // Function used to find the boundary loops.
@@ -616,55 +578,15 @@ func FillHoleLiepa(vertices []Vertex, faces []Face, boundaryLoop []int, method s
 
 func main() {
 
-	// vertices, faces, err := readObj("obj/sphere-1.obj")
-	//// vertices, faces, err := readObj("obj/sphere-2.obj")
-	//// vertices, faces, err := readObj("obj/bunny-1.obj")
-	//// vertices, faces, err := readObj("obj/flat.obj")
-	//// vertices, faces, err := readObj("obj/ico.obj")
-	//// vertices, faces, err := readObj("obj/crenellations.obj")
-	// if err != nil {
-	// 	fmt.Println("Error:", err)
-	// 	return
-	// }
-
-	// var mesh Mesh
-	// mesh.V = vertices
-	// t := []uint32{}
-
-	// loops := FindBoundaryLoops(faces)
-
-	// for _, loop := range loops {
-
-	// 	holeTriangles := FillHoleLiepa(vertices, faces, loop, "angle")
-
-	// 	faces = append(faces, holeTriangles...)
-
-	// 	for i := range faces {
-	// 		for j := range faces[i] {
-	// 			t = append(t, uint32(faces[i][j]))
-	// 		}
-	// 	}
-	// }
-
-	// mesh.T = t
-
-	// mesh.WriteToOBJ("filled.obj")
-
-	// fmt.Println("succesfully filled hole")
-
-	//////////////////////////////////////////////////////
-
-	m := readBinarySTL("stls/teapot_hole.stl")
-
-	vertices := m.V
-	faces := []Face{}
-	face := Face{}
-	for i, idx := range m.T {
-		face = append(face, int(idx))
-		if (i+1)%3 == 0 {
-			faces = append(faces, face)
-			face = Face{}
-		}
+	vertices, faces, err := readObj("obj/sphere-1.obj")
+	// vertices, faces, err := readObj("obj/sphere-2.obj")
+	// vertices, faces, err := readObj("obj/bunny-1.obj")
+	// vertices, faces, err := readObj("obj/flat.obj")
+	// vertices, faces, err := readObj("obj/ico.obj")
+	// vertices, faces, err := readObj("obj/crenellations.obj")
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
 	}
 
 	var mesh Mesh
@@ -689,6 +611,46 @@ func main() {
 	mesh.T = t
 
 	mesh.WriteToOBJ("filled.obj")
+
+	fmt.Println("succesfully filled hole")
+
+	//////////////////////////////////////////////////////
+
+	m := readBinarySTL("stls/teapot_hole.stl")
+
+	vertices = m.V
+	faces = []Face{}
+	face := Face{}
+	for i, idx := range m.T {
+		face = append(face, int(idx))
+		if (i+1)%3 == 0 {
+			faces = append(faces, face)
+			face = Face{}
+		}
+	}
+
+	//var mesh Mesh
+	mesh.V = vertices
+	t = []uint32{}
+
+	loops = FindBoundaryLoops(faces)
+
+	for _, loop := range loops {
+
+		holeTriangles := FillHoleLiepa(vertices, faces, loop, "angle")
+
+		faces = append(faces, holeTriangles...)
+
+		for i := range faces {
+			for j := range faces[i] {
+				t = append(t, uint32(faces[i][j]))
+			}
+		}
+	}
+
+	mesh.T = t
+
+	mesh.WriteToOBJ("filled_teapot.obj")
 
 	fmt.Println("succesfully filled hole")
 
