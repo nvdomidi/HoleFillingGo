@@ -620,42 +620,42 @@ func main() {
 
 	//////////////////////////////////////////////////////
 
-	m := readBinarySTL("stls/teapot_hole.stl")
+	// m := readBinarySTL("stls/teapot_hole.stl")
 
-	vertices = m.V
-	faces = []Face{}
-	face := Face{}
-	for i, idx := range m.T {
-		face = append(face, int(idx))
-		if (i+1)%3 == 0 {
-			faces = append(faces, face)
-			face = Face{}
-		}
-	}
+	// vertices = m.V
+	// faces = []Face{}
+	// face := Face{}
+	// for i, idx := range m.T {
+	// 	face = append(face, int(idx))
+	// 	if (i+1)%3 == 0 {
+	// 		faces = append(faces, face)
+	// 		face = Face{}
+	// 	}
+	// }
 
-	//var mesh Mesh
-	mesh.V = vertices
-	t = []uint32{}
+	// //var mesh Mesh
+	// mesh.V = vertices
+	// t = []uint32{}
 
-	loops = FindBoundaryLoops(faces)
+	// loops = FindBoundaryLoops(faces)
 
-	for _, loop := range loops {
+	// for _, loop := range loops {
 
-		holeTriangles := FillHoleLiepa(vertices, faces, loop, "angle")
+	// 	holeTriangles := FillHoleLiepa(vertices, faces, loop, "angle")
 
-		faces = append(faces, holeTriangles...)
+	// 	faces = append(faces, holeTriangles...)
 
-		for i := range faces {
-			for j := range faces[i] {
-				t = append(t, uint32(faces[i][j]))
-			}
-		}
-	}
+	// 	for i := range faces {
+	// 		for j := range faces[i] {
+	// 			t = append(t, uint32(faces[i][j]))
+	// 		}
+	// 	}
+	// }
 
-	mesh.T = t
+	// mesh.T = t
 
-	mesh.WriteToOBJ("filled_teapot.obj")
+	// mesh.WriteToOBJ("filled_teapot.obj")
 
-	fmt.Println("succesfully filled hole")
+	// fmt.Println("succesfully filled hole")
 
 }
