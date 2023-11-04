@@ -1,3 +1,7 @@
+/* Go implementation for "Filling holes in Meshes" */
+/* This code is mainly based on: https://github.com/russelmann/hole-filling-liepa/tree/main by Russelman */
+/* Link to the original paper by P. Liepa : https://diglib.eg.org/bitstream/handle/10.2312/SGP.SGP03.200-206/200-206.pdf?sequence=1&isAllowed=y */
+
 package main
 
 import (
